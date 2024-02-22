@@ -70,3 +70,20 @@ def update_employee(employee: Annotated[EmployeeUpdate, Depends()]):
     conn.commit()
 
     return {"message": f"Внесены изменения {query_params}"}
+
+
+@router.delete("/{employee_id}")
+def read_employee(employee_id: Annotated[EmployeeID, Depends()]):
+    """Удалить сотрудника по id"""
+
+    cur.execute(f"SELECT * FROM employees WHERE {employee_id}", employee_id)
+    employee = cur.fetchone()
+
+    if employee is None:
+
+        return {"message": "Сотрудник с указанным ID не найден"}
+    else:
+        cur.execute(f"DELETE FROM employees WHERE {employee_id}", (employee_id,))
+        conn.commit()
+
+        return {"message": "Сотрудник удален"}
