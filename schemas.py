@@ -7,7 +7,7 @@ class DegreeType(Enum):
     expert = "expert"
 
 
-class Employee(BaseModel):
+class EmployeeCreate(BaseModel):
     full_name: str
     job_title: str
     email: EmailStr | None = None
@@ -17,3 +17,10 @@ class Employee(BaseModel):
 # Модель "Сотрудник"
 class EmployeeID(BaseModel):
     id: int
+
+
+class EmployeeUpdate(BaseModel):
+    id: int
+    full_name: str | None = None
+    job_title: str | None = None
+    email: EmailStr | None = None

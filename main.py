@@ -5,7 +5,7 @@ from database import cur, conn
 from employees_router import router as employees_router
 from typing import Annotated
 
-from schemas import Employee
+from schemas import EmployeeCreate
 
 create_tables = CreateTables()
 create_tables.create_tables()

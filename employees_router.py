@@ -1,11 +1,9 @@
 from typing import Annotated
-from urllib import response
 
 from fastapi import APIRouter, Depends
 
 from database import cur, conn
-from schemas import Employee, EmployeeID
-
+from schemas import EmployeeCreate, EmployeeID, EmployeeUpdate
 
 router = APIRouter(
     prefix="/employees",
@@ -14,7 +12,7 @@ router = APIRouter(
 
 
 @router.post("")
-def create_employee(employee: Annotated[Employee, Depends()]):
+def create_employee(employee: Annotated[EmployeeCreate, Depends()]):
     """Добавить сотрудника"""
 
     cur.execute(
@@ -42,3 +40,33 @@ def read_employee(employee_id: Annotated[EmployeeID, Depends()]):
         return employee_dict
     else:
         return {"message": "Сотрудник не найден"}
+
+
+@router.put("/{employee_id}")
+def update_employee(employee: Annotated[EmployeeUpdate, Depends()]):
+    """"Изменить данные сотрудника"""
+
+    query_params = {}
+    query_set = []
+
+    if employee.full_name is not None:
+        query_params["full_name"] = employee.full_name
+        query_set.append("full_name = %s")
+
+    if employee.job_title is not None:
+        query_params["job_title"] = employee.job_title
+        query_set.append("job_title = %s")
+
+    if employee.email is not None:
+        query_params["email"] = employee.email
+        query_set.append("email = %s")
+
+    values = list(query_params.values())
+    values.append(employee.id)
+
+    query = "UPDATE employees SET " + ", ".join(query_set) + " WHERE id = %s"
+
+    cur.execute(query, values)
+    conn.commit()
+
+    return {"message": f"Внесены изменения {query_params}"}
