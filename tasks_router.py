@@ -25,22 +25,26 @@ def create_task(task: Annotated[TaskCreate, Depends()]):
     return {"id": task_id, **task.dict()}
 
 
-# @router.get("/{task_id}")
-# def read_task(task_id: Annotated[EmployeeID, Depends()]):
-#     """Получить сотрудника по id"""
-#
-#     cur.execute(f"SELECT * FROM tasks WHERE {task_id}", task_id)
-#     task = cur.fetchone()
-#     if task:
-#         task_dict = {
-#             "id": task[0],
-#             "full_name": task[1],
-#             "job_title": task[2],
-#             "email": task[3],
-#         }
-#         return task_dict
-#     else:
-#         return {"message": "Сотрудник не найден"}
+@router.get("/{task_id}")
+def read_task(task_id: Annotated[FieldID, Depends()]):
+    """Получить задачу по id"""
+
+    cur.execute(f"SELECT * FROM tasks WHERE {task_id}", task_id)
+    task = cur.fetchone()
+    print(task)
+    if task:
+        task_dict = {
+            "id": task[0],
+            "name": task[1],
+            "description": task[2],
+            "status": task[3],
+            "deadline": task[4],
+            "parent_task": task[5],
+            "employee_id": task[6],
+        }
+        return task_dict
+    else:
+        return {"message": "Задача не найдена"}
 #
 #
 # @router.put("/{task_id}")
