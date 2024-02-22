@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from database import cur, conn
-from schemas import EmployeeCreate, FieldID, EmployeeUpdate, TaskCreate
+from schemas import EmployeeCreate, FieldID, EmployeeUpdate, TaskCreate, TaskUpdate
 
 router = APIRouter(
     prefix="/tasks",
@@ -45,38 +45,50 @@ def read_task(task_id: Annotated[FieldID, Depends()]):
         return task_dict
     else:
         return {"message": "Задача не найдена"}
-#
-#
-# @router.put("/{task_id}")
-# def update_task(task: Annotated[EmployeeUpdate, Depends()]):
-#     """"Изменить данные сотрудника"""
-#
-#     query_params = {}
-#     query_set = []
-#
-#     if task.full_name is not None:
-#         query_params["full_name"] = task.full_name
-#         query_set.append("full_name = %s")
-#
-#     if task.job_title is not None:
-#         query_params["job_title"] = task.job_title
-#         query_set.append("job_title = %s")
-#
-#     if task.email is not None:
-#         query_params["email"] = task.email
-#         query_set.append("email = %s")
-#
-#     values = list(query_params.values())
-#     values.append(task.id)
-#
-#     query = "UPDATE tasks SET " + ", ".join(query_set) + " WHERE id = %s"
-#
-#     cur.execute(query, values)
-#     conn.commit()
-#
-#     return {"message": f"Внесены изменения {query_params}"}
-#
-#
+
+
+@router.put("/{task_id}")
+def update_task(task: Annotated[TaskUpdate, Depends()]):
+    """"Изменить данные задачи"""
+
+    query_params = {}
+    query_set = []
+
+    if task.name is not None:
+        query_params["name"] = task.name
+        query_set.append("name = %s")
+
+    if task.description is not None:
+        query_params["description"] = task.description
+        query_set.append("description = %s")
+
+    if task.status is not None:
+        query_params["status"] = task.status.value
+        query_set.append("status = %s")
+
+    if task.deadline is not None:
+        query_params["deadline"] = task.deadline
+        query_set.append("deadline = %s")
+
+    if task.parent_task is not None:
+        query_params["parent_task"] = task.parent_task
+        query_set.append("parent_task = %s")
+
+    if task.employee_id is not None:
+        query_params["employee_id"] = task.employee_id
+        query_set.append("employee_id = %s")
+
+    values = list(query_params.values())
+    values.append(task.id)
+
+    query = "UPDATE tasks SET " + ", ".join(query_set) + " WHERE id = %s"
+
+    cur.execute(query, values)
+    conn.commit()
+
+    return {"message": f"Внесены изменения {query_params}"}
+
+
 # @router.delete("/{task_id}")
 # def read_task(task_id: Annotated[EmployeeID, Depends()]):
 #     """Удалить сотрудника по id"""

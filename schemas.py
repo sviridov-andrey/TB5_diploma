@@ -19,10 +19,21 @@ class EmployeeUpdate(BaseModel):
     job_title: str | None = None
     email: EmailStr | None = None
 
+
 class StatusList(Enum):
     important_task = "Важная задача"
     in_work = "В работе"
     completed = "Завершена"
+
+
+class TaskUpdate(BaseModel):
+    id: int
+    name: str | None = None
+    description: str | None = None
+    status: StatusList
+    deadline: datetime | None = None
+    parent_task: int | None = None
+    employee_id: int | None = None
 
 
 class TaskCreate(BaseModel):
