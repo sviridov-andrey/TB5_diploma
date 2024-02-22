@@ -89,18 +89,18 @@ def update_task(task: Annotated[TaskUpdate, Depends()]):
     return {"message": f"Внесены изменения {query_params}"}
 
 
-# @router.delete("/{task_id}")
-# def read_task(task_id: Annotated[EmployeeID, Depends()]):
-#     """Удалить сотрудника по id"""
-#
-#     cur.execute(f"SELECT * FROM tasks WHERE {task_id}", task_id)
-#     task = cur.fetchone()
-#
-#     if task is None:
-#
-#         return {"message": "Сотрудник с указанным ID не найден"}
-#     else:
-#         cur.execute(f"DELETE FROM tasks WHERE {task_id}", (task_id,))
-#         conn.commit()
-#
-#         return {"message": "Сотрудник удален"}
+@router.delete("/{task_id}")
+def read_task(task_id: Annotated[FieldID, Depends()]):
+    """Удалить задачу по id"""
+
+    cur.execute(f"SELECT * FROM tasks WHERE {task_id}", task_id)
+    task = cur.fetchone()
+
+    if task is None:
+
+        return {"message": "Задача с указанным ID не найдена"}
+    else:
+        cur.execute(f"DELETE FROM tasks WHERE {task_id}", (task_id,))
+        conn.commit()
+
+        return {"message": "Задача удалена"}
