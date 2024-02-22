@@ -1,19 +1,18 @@
-# Создание таблиц, если их нет в базе
-from database import conn, connect_base
-
-cur = connect_base()
+from database import cur, conn
 
 
 class CreateTables:
     """Первичне создание отсутствующих таблиц в базе"""
+
     @classmethod
     def create_tables(cls):
+
         cur.execute("""
             CREATE TABLE IF NOT EXISTS employees (
                 id SERIAL PRIMARY KEY,
                 full_name VARCHAR(255),
                 job_title TEXT ,
-                email VARCHAR(100) UNIQUE
+                email VARCHAR(100)
             )
         """)
 
