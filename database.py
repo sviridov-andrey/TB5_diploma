@@ -26,4 +26,7 @@ conn = psycopg2.connect(
     host=os.getenv("DB_HOST")
 )
 
-cur = conn.cursor()
+
+def connect_base():
+    cur = conn.cursor()
+    return cur
