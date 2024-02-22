@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from database import cur, conn
-from schemas import EmployeeCreate, EmployeeID, EmployeeUpdate
+from schemas import EmployeeCreate, FieldID, EmployeeUpdate
 
 router = APIRouter(
     prefix="/employees",
@@ -25,7 +25,7 @@ def create_employee(employee: Annotated[EmployeeCreate, Depends()]):
 
 
 @router.get("/{employee_id}")
-def read_employee(employee_id: Annotated[EmployeeID, Depends()]):
+def read_employee(employee_id: Annotated[FieldID, Depends()]):
     """Получить сотрудника по id"""
 
     cur.execute(f"SELECT * FROM employees WHERE {employee_id}", employee_id)
@@ -50,7 +50,7 @@ def update_employee(employee: Annotated[EmployeeUpdate, Depends()]):
     query_set = []
 
     if employee.full_name is not None:
-        query_params["full_name"] = employee.full_name
+        query_params["full_name"] = employee.full_name.title()
         query_set.append("full_name = %s")
 
     if employee.job_title is not None:
@@ -73,7 +73,7 @@ def update_employee(employee: Annotated[EmployeeUpdate, Depends()]):
 
 
 @router.delete("/{employee_id}")
-def read_employee(employee_id: Annotated[EmployeeID, Depends()]):
+def read_employee(employee_id: Annotated[FieldID, Depends()]):
     """Удалить сотрудника по id"""
 
     cur.execute(f"SELECT * FROM employees WHERE {employee_id}", employee_id)
