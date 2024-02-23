@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, parse_obj_as
+from pydantic import BaseModel, EmailStr
 from enum import Enum
 
 

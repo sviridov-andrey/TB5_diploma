@@ -1,9 +1,8 @@
 from typing import Annotated
-
 from fastapi import APIRouter, Depends
-
 from database import connect
 from schemas import EmployeeCreate, FieldID, EmployeeUpdate
+
 
 router = APIRouter(
     prefix="/employees",
