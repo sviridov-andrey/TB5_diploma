@@ -1,4 +1,4 @@
-from database import cur, conn
+from database import connect
 
 
 class CreateTables:
@@ -6,6 +6,8 @@ class CreateTables:
 
     @classmethod
     def create_tables(cls):
+        conn = connect()
+        cur = conn.cursor()
 
         cur.execute("""
             CREATE TABLE IF NOT EXISTS employees (
@@ -31,3 +33,5 @@ class CreateTables:
         """)
 
         conn.commit()
+        cur.close()
+        conn.close()

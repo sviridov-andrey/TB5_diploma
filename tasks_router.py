@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from database import cur, conn
+from database import connect
 from schemas import EmployeeCreate, FieldID, EmployeeUpdate, TaskCreate, TaskUpdate
 
 router = APIRouter(
@@ -15,6 +15,9 @@ router = APIRouter(
 def create_task(task: Annotated[TaskCreate, Depends()]):
     """Добавить задачу"""
 
+    conn = connect()
+    cur = conn.cursor()
+
     cur.execute(
         f"INSERT INTO tasks (name, description, status, deadline, parent_task, employee_id) "
         f"VALUES (%s, %s, %s, %s, %s, %s) RETURNING id",
@@ -22,12 +25,18 @@ def create_task(task: Annotated[TaskCreate, Depends()]):
     )
     task_id = cur.fetchone()[0]
     conn.commit()
+    cur.close()
+    conn.close()
+
     return {"id": task_id, **task.dict()}
 
 
 @router.get("/{task_id}")
 def read_task(task_id: Annotated[FieldID, Depends()]):
     """Получить задачу по id"""
+
+    conn = connect()
+    cur = conn.cursor()
 
     cur.execute(f"SELECT * FROM tasks WHERE {task_id}", task_id)
     task = cur.fetchone()
@@ -42,14 +51,23 @@ def read_task(task_id: Annotated[FieldID, Depends()]):
             "parent_task": task[5],
             "employee_id": task[6],
         }
+        cur.close()
+        conn.close()
+
         return task_dict
     else:
+        cur.close()
+        conn.close()
+
         return {"message": "Задача не найдена"}
 
 
 @router.put("/{task_id}")
 def update_task(task: Annotated[TaskUpdate, Depends()]):
     """"Изменить данные задачи"""
+
+    conn = connect()
+    cur = conn.cursor()
 
     query_params = {}
     query_set = []
@@ -85,6 +103,8 @@ def update_task(task: Annotated[TaskUpdate, Depends()]):
 
     cur.execute(query, values)
     conn.commit()
+    cur.close()
+    conn.close()
 
     return {"message": f"Внесены изменения {query_params}"}
 
@@ -93,14 +113,21 @@ def update_task(task: Annotated[TaskUpdate, Depends()]):
 def read_task(task_id: Annotated[FieldID, Depends()]):
     """Удалить задачу по id"""
 
+    conn = connect()
+    cur = conn.cursor()
+
     cur.execute(f"SELECT * FROM tasks WHERE {task_id}", task_id)
     task = cur.fetchone()
 
     if task is None:
+        cur.close()
+        conn.close()
 
         return {"message": "Задача с указанным ID не найдена"}
     else:
         cur.execute(f"DELETE FROM tasks WHERE {task_id}", (task_id,))
         conn.commit()
+        cur.close()
+        conn.close()
 
         return {"message": "Задача удалена"}

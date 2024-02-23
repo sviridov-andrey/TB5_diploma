@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from database import cur, conn
+from database import connect
 from schemas import EmployeeCreate, FieldID, EmployeeUpdate
 
 router = APIRouter(
@@ -15,18 +15,27 @@ router = APIRouter(
 def create_employee(employee: Annotated[EmployeeCreate, Depends()]):
     """Добавить сотрудника"""
 
+    conn = connect()
+    cur = conn.cursor()
+
     cur.execute(
         "INSERT INTO employees (full_name, job_title, email) VALUES (%s, %s, %s) RETURNING id",
         (employee.full_name.title(), employee.job_title, employee.email)
     )
     employee_id = cur.fetchone()[0]
     conn.commit()
+    cur.close()
+    conn.close()
+
     return {"id": employee_id, **employee.dict()}
 
 
 @router.get("/{employee_id}")
 def read_employee(employee_id: Annotated[FieldID, Depends()]):
     """Получить сотрудника по id"""
+
+    conn = connect()
+    cur = conn.cursor()
 
     cur.execute(f"SELECT * FROM employees WHERE {employee_id}", employee_id)
     employee = cur.fetchone()
@@ -37,14 +46,21 @@ def read_employee(employee_id: Annotated[FieldID, Depends()]):
             "job_title": employee[2],
             "email": employee[3],
         }
+        cur.close()
+        conn.close()
         return employee_dict
     else:
+        cur.close()
+        conn.close()
         return {"message": "Сотрудник не найден"}
 
 
 @router.put("/{employee_id}")
 def update_employee(employee: Annotated[EmployeeUpdate, Depends()]):
     """"Изменить данные сотрудника"""
+
+    conn = connect()
+    cur = conn.cursor()
 
     query_params = {}
     query_set = []
@@ -68,6 +84,8 @@ def update_employee(employee: Annotated[EmployeeUpdate, Depends()]):
 
     cur.execute(query, values)
     conn.commit()
+    cur.close()
+    conn.close()
 
     return {"message": f"Внесены изменения {query_params}"}
 
@@ -76,14 +94,21 @@ def update_employee(employee: Annotated[EmployeeUpdate, Depends()]):
 def read_employee(employee_id: Annotated[FieldID, Depends()]):
     """Удалить сотрудника по id"""
 
+    conn = connect()
+    cur = conn.cursor()
+
     cur.execute(f"SELECT * FROM employees WHERE {employee_id}", employee_id)
     employee = cur.fetchone()
 
     if employee is None:
 
+        cur.close()
+        conn.close()
         return {"message": "Сотрудник с указанным ID не найден"}
     else:
         cur.execute(f"DELETE FROM employees WHERE {employee_id}", (employee_id,))
         conn.commit()
+        cur.close()
+        conn.close()
 
         return {"message": "Сотрудник удален"}
