@@ -128,9 +128,24 @@ def important_tasks():
 
     return important_tasks_list
 
-@router.get("/important_tasks")
-def important_tasks():
-    """Запрашивает из БД список важных задач не взятых в работу"""
+
+@router.get("/ordinary_tasks")
+def ordinary_tasks():
+    """Запрашивает из БД список обычных задач не взятых в работу"""
 
     conn = connect()
     cur = conn.cursor()
+
+    query = """
+        SELECT t.name, t.description, t.deadline
+        from tasks t
+        where status = 'Создана' AND parent_task IS null
+        ORDER BY t.id     
+        """
+
+    cur.execute(query)
+    result = [dict(zip([column[0] for column in cur.description], row)) for row in cur.fetchall()]
+    cur.close()
+    conn.close()
+
+    return result

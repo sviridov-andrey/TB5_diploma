@@ -1,6 +1,7 @@
 from datetime import datetime
 from pydantic import BaseModel, EmailStr
 from enum import Enum
+from typing import Optional
 
 
 class EmployeeCreate(BaseModel):
@@ -21,7 +22,7 @@ class EmployeeUpdate(BaseModel):
 
 
 class StatusList(Enum):
-    important_task = "Важная задача"
+    important_task = "Создана"
     in_work = "В работе"
     completed = "Завершена"
 
@@ -32,8 +33,8 @@ class TaskUpdate(BaseModel):
     description: str | None = None
     status: StatusList
     deadline: datetime | None = None
-    parent_task: int | None = None
-    employee_id: int | None = None
+    parent_task: Optional[int] = None
+    employee_id: Optional[int] = None
 
 
 class TaskCreate(BaseModel):
@@ -43,5 +44,3 @@ class TaskCreate(BaseModel):
     deadline: datetime
     parent_task: int | None = None
     employee_id: int | None = None
-
-
