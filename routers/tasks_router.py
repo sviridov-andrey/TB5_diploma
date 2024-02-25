@@ -17,11 +17,12 @@ def create_task(task: Annotated[TaskCreate, Depends()]):
     conn = connect()
     cur = conn.cursor()
 
-    cur.execute(
-        f"INSERT INTO tasks (name, description, status, deadline, parent_task, employee_id) "
-        f"VALUES (%s, %s, %s, %s, %s, %s) RETURNING id",
-        (task.name, task.description, task.status.value, task.deadline, task.parent_task, task.employee_id)
-    )
+    cur.execute("""
+    "INSERT INTO tasks (name, description, status, deadline, parent_task, employee_id)"
+    "VALUES (%s, %s, %s, %s, %s, %s) RETURNING id",
+    (task.name, task.description, task.status.value, task.deadline, task.parent_task, task.employee_id)
+    """)
+
     task_id = cur.fetchone()[0]
     conn.commit()
     cur.close()
@@ -109,7 +110,7 @@ def update_task(task: Annotated[TaskUpdate, Depends()]):
 
 
 @router.delete("/{task_id}")
-def read_task(task_id: Annotated[FieldID, Depends()]):
+def delete_task(task_id: Annotated[FieldID, Depends()]):
     """Удалить задачу по id"""
 
     conn = connect()

@@ -65,11 +65,11 @@ def important_tasks():
 
     # Возвращает количество задач у сотрудников
     count_task_query = """
-    SELECT e.full_name, COUNT(t.employee_id) 
+    SELECT e.full_name, COUNT(t.employee_id)
     FROM employees e
     LEFT JOIN tasks t ON e.id = t.employee_id AND t.status = 'В работе'
     WHERE t.employee_id IS NOT NULL
-    GROUP BY e.full_name, e.job_title    
+    GROUP BY e.full_name, e.job_title
     """
 
     cur.execute(count_task_query)
@@ -140,7 +140,7 @@ def ordinary_tasks():
         SELECT t.name, t.description, t.deadline
         from tasks t
         where status = 'Создана' AND parent_task IS null
-        ORDER BY t.id     
+        ORDER BY t.id
         """
 
     cur.execute(query)

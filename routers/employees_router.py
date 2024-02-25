@@ -90,7 +90,7 @@ def update_employee(employee: Annotated[EmployeeUpdate, Depends()]):
 
 
 @router.delete("/{employee_id}")
-def read_employee(employee_id: Annotated[FieldID, Depends()]):
+def delete_employee(employee_id: Annotated[FieldID, Depends()]):
     """Удалить сотрудника по id"""
 
     conn = connect()
